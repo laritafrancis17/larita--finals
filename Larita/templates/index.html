@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ekoyix - Lite Booking System</title>
+    <!-- Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font (for main text) & Orbitron (for futuristic headings) --><link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary-dark: #3f0071; /* Dark Purple */
+            --color-secondary-accent: #00d9ff; /* Bright Cyan */
+            --color-text-light: #e0e7ff; /* Light Blue/Purple for text */
+            --color-card-bg: rgba(255, 255, 255, 0.08); /* Transparent dark card background */
+            --color-card-border: rgba(0, 217, 255, 0.2); /* Subtle cyan border */
+            --color-input-bg: rgba(255, 255, 255, 0.05); /* Transparent dark input background */
+            --color-success: #10b981; /* Emerald Green */
+            --color-error: #f87171; /* Red */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0c002b; /* Very dark blue/purple */
+            color: var(--color-text-light);
+            overflow-x: hidden; /* Prevent horizontal scroll from absolute elements */
+        }
+        
+        /* New Futuristic Font Styling with Glow */
+        .font-futuristic {
+            font-family: 'Orbitron', sans-serif; /* Changed from VT323 to Orbitron */
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.7); /* Cyan glow */
+        }
+
+        /* Custom scrollbar for aesthetics */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: var(--color-secondary-accent);
+            border-radius: 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        .card {
+            background-color: var(--color-card-bg);
+            border: 1px solid var(--color-card-border);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 217, 255, 0.1), 0 0 20px rgba(0, 217, 255, 0.05); /* Subtle glow */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 217, 255, 0.15), 0 0 30px rgba(0, 217, 255, 0.1);
+        }
+        input, select, textarea {
+            background-color: var(--color-input-bg);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            color: var(--color-text-light);
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--color-secondary-accent);
+            box-shadow: 0 0 0 2px rgba(0, 217, 255, 0.5);
+            outline: none;
+        }
+        .btn-primary {
+            background-color: #8b5cf6; /* Purple-500 */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3);
+        }
+        .btn-primary:hover {
+            background-color: #7c3aed; /* Purple-600 */
+            box-shadow: 0 6px 15px rgba(139, 92, 246, 0.4);
+        }
+        .btn-secondary {
+            background-color: var(--color-secondary-accent);
+            color: #0c002b; /* Dark text for bright button */
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 700;
+            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            box-shadow: 0 4px 10px rgba(0, 217, 255, 0.3);
+        }
+        .btn-secondary:hover {
+            background-color: #00ecff;
+            box-shadow: 0 6px 15px rgba(0, 217, 255, 0.4);
+        }
+
+        /* Hero section specific styling for the isometric feel */
+        .hero-section {
+            position: relative;
+            background: linear-gradient(135deg, #1a004b, #0c002b);
+            overflow: hidden;
+            border-radius: 1.5rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            left: -20%;
+            width: 140%;
+            height: 140%;
+            background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+            animation: rotateBg 20s linear infinite;
+        }
+        @keyframes rotateBg {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .isometric-figure {
+            position: absolute;
+            bottom: 0;
+            right: 10%;
+            width: 200px; /* Adjust size as needed */
+            height: 200px;
+            z-index: 1;
+        }
+
+        /* Calendar grid for contact list */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .calendar-day-card {
+            position: relative;
+            background-color: var(--color-card-bg);
+            border: 1px solid var(--color-card-border);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            color: var(--color-text-light);
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .calendar-day-card:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 0 25px rgba(0, 217, 255, 0.2);
+        }
+        .calendar-date-number {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: rgba(0, 217, 255, 0.3); /* Faded accent */
+            line-height: 1;
+        }
+        
+        /* Notification Panel Styling */
+        #notificationPanel {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            width: 100%;
+            max-width: 320px;
+            z-index: 100;
+            max-height: 80vh;
+            overflow-y: auto;
+            pointer-events: none; /* Allow clicks through empty space */
+        }
+        .notification-item {
+            pointer-events: all; /* Make individual items clickable/interactive */
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s ease-out;
+            margin-top: 0.5rem;
+        }
+        .notification-item.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-10 min-h-screen">
+
+    <div id="app" class="max-w-8xl mx-auto">
+        <!-- Header & User Info (Updated for dark theme) --><header class="mb-10 p-6 rounded-xl shadow-xl flex flex-col md:flex-row justify-between items-center relative overflow-hidden bg-gradient-to-r from-purple-900 to-indigo-900 border border-purple-700">
+            <div class="absolute inset-0 z-0 opacity-20" style="background-image: url('data:image/svg+xml,%3Csvg width=\'20\' height=\'20\' viewBox=\'0 0 20 20\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%23a0aec0\' fill-opacity=\'0.1\' fill-rule=\'evenodd\'%3E%3Ccircle cx=\'3\' cy=\'3\' r=\'3\'/%3E%3Ccircle cx=\'13\' cy=\'13\' r=\'3\'/%3E%3C/g%3E%3C/svg%3E');"></div>
+            
+            <div class="flex items-center space-x-3 relative z-10">
+                <svg class="w-10 h-10 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2zm7-9v4m0 0h4m-4 0h-4"></path></svg>
+                <h1 class="text-4xl font-extrabold text-white font-futuristic">Ekoyix - Lite</h1>
+            </div>
+            <div class="text-sm text-purple-200 mt-3 md:mt-0 bg-purple-800 bg-opacity-50 p-2 rounded-lg relative z-10 border border-purple-600">
+                <span class="font-medium">User ID:</span> <span id="userIdDisplay" class="font-mono text-xs text-secondary-accent select-all">Loading...</span>
+            </div>
+        </header>
+
+        <!-- Main Content Grid --><div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Hero Section: Add Contact Form --><div class="lg:col-span-1 hero-section p-8 rounded-xl flex flex-col justify-center items-start text-left min-h-[500px]">
+                <h2 class="text-5xl font-extrabold text-white mb-4 leading-tight relative z-10 font-futuristic">
+                    Appointment<br><span class="text-secondary-accent">BOOKING</span>
+                </h2>
+                <p class="text-lg text-purple-200 mb-8 max-w-md relative z-10">
+                    Streamline your client interactions and booking schedules with ease. Manage contacts and appointments in one intuitive system.
+                </p>
+                
+                <form id="addContactForm" class="space-y-4 w-full max-w-md relative z-10">
+                    <div>
+                        <label for="name" class="block text-sm font-semibold text-purple-200 mb-1">Name</label>
+                        <input type="text" id="name" required placeholder="Client Name" class="w-full px-4 py-2 rounded-lg focus:ring-secondary-accent focus:border-secondary-accent transition duration-150 shadow-lg">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-semibold text-purple-200 mb-1">Email</label>
+                        <input type="email" id="email" required placeholder="client@example.com" class="w-full px-4 py-2 rounded-lg focus:ring-secondary-accent focus:border-secondary-accent transition duration-150 shadow-lg">
+                    </div>
+                    <div>
+                        <label for="phone" class="block text-sm font-semibold text-purple-200 mb-1">Phone (Optional)</label>
+                        <input type="tel" id="phone" placeholder="(555) 123-4567" class="w-full px-4 py-2 rounded-lg focus:ring-secondary-accent focus:border-secondary-accent transition duration-150 shadow-lg">
+                    </div>
+                    <button type="submit" class="w-full btn-primary uppercase tracking-wider">
+                        Add New Contact
+                    </button>
+                    <!-- formStatus is now only used for immediate error feedback, but we will mostly rely on the notification panel --><p id="formStatus" class="text-sm mt-2 text-center font-medium hidden"></p>
+                </form>
+
+                <!-- Isometric Figure (simple white silhouette) --><svg class="isometric-figure" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="figureGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:white;stop-opacity:0.8" />
+                            <stop offset="100%" style="stop-color:white;stop-opacity:0.4" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Body --><path d="M50 100 L30 60 L70 60 L50 100 Z" fill="url(#figureGradient)"/>
+                    <rect x="40" y="30" width="20" height="30" rx="5" fill="url(#figureGradient)"/>
+                    <!-- Head --><circle cx="50" cy="20" r="10" fill="url(#figureGradient)"/>
+                    <!-- Arm (pointing towards inputs/calendar area) --><path d="M60 40 L75 30 L80 40 L65 50 Z" fill="url(#figureGradient)"/>
+                </svg>
+            </div>
+
+            <!-- Column 2: Contact List (Styled as calendar elements) --><div class="lg:col-span-1 card min-h-[500px] flex flex-col">
+                <h2 class="text-3xl font-bold text-white mb-6 flex items-center">
+                    <svg class="w-7 h-7 mr-3 text-secondary-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2zm7-9v4m0 0h4m-4 0h-4"></path></svg>
+                    All Contacts (<span id="contactCount">0</span>)
+                </h2>
+                <div id="contactsList" class="flex-grow calendar-grid custom-scrollbar pr-2">
+                    <p class="text-purple-300 text-center py-4 col-span-full" id="loadingMessage">Loading contacts or waiting for authentication...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal for Booking Details (Dark themed) --><div id="bookingModal" class="fixed inset-0 bg-gray-900 bg-opacity-80 hidden items-center justify-center p-4 z-50 transition-opacity duration-300">
+            <div class="bg-[#1a004b] rounded-xl shadow-2xl w-full max-w-3xl p-8 relative transform scale-100 transition-transform duration-300 border border-purple-700">
+                
+                <!-- Close Button --><button onclick="closeModal()" class="absolute top-4 right-4 text-purple-300 hover:text-white transition">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+
+                <h3 class="text-3xl font-extrabold text-secondary-accent mb-6 border-b border-purple-700 pb-3 flex items-center">
+                    <svg class="w-7 h-7 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Contact Details
+                </h3>
+                
+                <!-- Contact Info Display --><div class="bg-purple-900 bg-opacity-30 p-4 rounded-lg space-y-2 mb-8 border border-purple-700">
+                    <p class="text-xl font-bold text-white" id="detailName"></p>
+                    <p class="text-sm text-purple-200 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-secondary-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-19 8a2 2 0 002 2h16a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v9z"></path></svg>
+                        <span id="detailEmail" class="font-medium"></span>
+                    </p>
+                    <p class="text-sm text-purple-200 flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-secondary-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.074 1.037c-.686.343-1.45.087-1.78-.606L3 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 10a4 4 0 010 8m-4-8a4 4 0 00-4 4 4 4 0 004 4m0-8h4"></path></svg>
+                        <span id="detailPhone" class="font-medium"></span>
+                    </p>
+                    <p class="text-xs text-purple-400 pt-1 border-t border-purple-700 mt-2">Internal ID: <span id="detailId" class="font-mono text-xs text-purple-300"></span></p>
+                </div>
+
+                <!-- Add Booking Form --><h4 class="text-xl font-bold text-white mb-4 border-b border-purple-700 pb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-secondary-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Schedule New Booking
+                </h4>
+                <form id="addBookingForm" class="grid grid-cols-6 gap-4 mb-6 p-4 border border-purple-700 rounded-lg bg-purple-900 bg-opacity-30">
+                    <div class="col-span-6 md:col-span-2">
+                        <label for="bookingDate" class="block text-sm font-medium text-purple-200 mb-1">Date</label>
+                        <input type="date" id="bookingDate" required class="w-full px-3 py-2 rounded-lg shadow-sm">
+                    </div>
+                    <div class="col-span-6 md:col-span-2">
+                        <label for="bookingTime" class="block text-sm font-medium text-purple-200 mb-1">Time</label>
+                        <input type="time" id="bookingTime" required class="w-full px-3 py-2 rounded-lg shadow-sm">
+                    </div>
+                    <div class="col-span-6 md:col-span-2 flex flex-col justify-end">
+                        <button type="submit" class="w-full btn-secondary">
+                            Add Booking
+                        </button>
+                    </div>
+                    <div class="col-span-6">
+                        <label for="bookingDescription" class="block text-sm font-medium text-purple-200 mb-1">Description / Service</label>
+                        <input type="text" id="bookingDescription" required placeholder="Project meeting, Haircut appointment, etc." class="w-full px-3 py-2 rounded-lg shadow-sm">
+                    </div>
+                </form>
+
+                <!-- Booking History --><h4 class="text-xl font-bold text-white mb-4 border-b border-purple-700 pb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-secondary-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Booking History
+                </h4>
+                <div id="bookingHistory" class="space-y-3 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+                    <p class="text-purple-400 text-center py-2 italic">No bookings yet.</p>
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+    
+    <!-- Notification Panel Container --><div id="notificationPanel" class="flex flex-col-reverse custom-scrollbar">
+        <!-- Notifications will be appended here -->
+    </div>
+
+    <!-- Firebase Imports and Logic -->
+     <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+  import { getFirestore, doc, addDoc, updateDoc, onSnapshot, collection, query, serverTimestamp, arrayUnion, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+  // --- GLOBAL VARIABLES ---
+  let db = null, auth = null;
+  let userId = null;
+  let currentContactId = null;
+
+  setLogLevel('Debug');
+
+  // --- FIREBASE CONFIGURATION ---
+  // Replace these with your real Firebase config to enable real Firestore & Auth
+  const firebaseConfig = window.__firebase_config || {
+    apiKey: null,  // Set null to trigger LOCAL_MODE
+    authDomain: null,
+    projectId: null
+  };
+
+  const LOCAL_MODE = !firebaseConfig.apiKey; // true if API key is missing
+
+  // --- UTILITY FUNCTIONS ---
+  const safeGet = (obj, key, defaultValue = '') => obj && obj[key] !== undefined ? obj[key] : defaultValue;
+
+  const addNotification = (message, type='info') => {
+    const panel = document.getElementById('notificationPanel');
+    const item = document.createElement('div');
+
+    let bgColor, icon;
+    switch(type) {
+      case 'success': bgColor='bg-green-700/90 border-green-500'; icon='✔'; break;
+      case 'error':   bgColor='bg-red-700/90 border-red-500'; icon='✖'; break;
+      default:        bgColor='bg-blue-700/90 border-blue-500'; icon='ℹ'; break;
+    }
+
+    item.className = `notification-item p-3 rounded-lg shadow-xl text-sm text-white font-medium backdrop-blur-sm border ${bgColor} flex items-center`;
+    item.innerHTML = `${icon} ${message}`;
+    panel.prepend(item);
+
+    setTimeout(() => item.classList.add('show'), 50);
+    setTimeout(() => {
+      item.remove();
+    }, 5000);
+  };
+
+  // --- MODAL FUNCTIONS ---
+  window.openModal = (contact) => {
+    currentContactId = contact.id;
+    document.getElementById('detailName').textContent = safeGet(contact,'name');
+    document.getElementById('detailEmail').textContent = safeGet(contact,'email');
+    document.getElementById('detailPhone').textContent = safeGet(contact,'phone') || 'N/A';
+    document.getElementById('detailId').textContent = currentContactId;
+    document.getElementById('addBookingForm').reset();
+    renderBookings(contact.bookings || []);
+    const modal = document.getElementById('bookingModal');
+    modal.style.display = 'flex';
+    setTimeout(()=>modal.classList.add('opacity-100'),10);
+  };
+
+  window.closeModal = () => {
+    const modal = document.getElementById('bookingModal');
+    modal.classList.remove('opacity-100');
+    setTimeout(()=>{ modal.style.display='none'; currentContactId=null }, 300);
+  };
+
+  // --- RENDER FUNCTIONS ---
+  const renderContacts = (contacts) => {
+    const list = document.getElementById('contactsList');
+    list.innerHTML = '';
+    document.getElementById('contactCount').textContent = contacts.length;
+
+    if(!contacts.length) {
+      list.innerHTML = `<p class="text-purple-300 text-center py-4 col-span-full">No contacts yet.</p>`;
+      return;
+    }
+
+    contacts.forEach(contact => {
+      const card = document.createElement('div');
+      card.className = 'calendar-day-card';
+      card.setAttribute('onclick', `openModal(${JSON.stringify(contact).replace(/'/g,"\\'")})`);
+      const date = contact.createdAt?.toDate ? contact.createdAt.toDate() : new Date();
+      const dayOfMonth = date.getDate();
+      card.innerHTML = `
+        <div class="calendar-date-number">${dayOfMonth}</div>
+        <p class="text-xl font-bold text-white mb-2">${safeGet(contact,'name')}</p>
+        <p class="text-sm text-purple-300 mb-3">${safeGet(contact,'email')}</p>
+        <div class="text-xs text-secondary-accent font-semibold">Bookings: ${contact.bookings?.length || 0}</div>
+      `;
+      list.appendChild(card);
+    });
+  };
+
+  const renderBookings = (bookings) => {
+    const historyList = document.getElementById('bookingHistory');
+    historyList.innerHTML = '';
+    if(!bookings.length) {
+      historyList.innerHTML = `<p class="text-purple-400 text-center py-2 italic">No bookings yet.</p>`;
+      return;
+    }
+    bookings.sort((a,b)=> new Date(`${b.date}T${b.time}`) - new Date(`${a.date}T${a.time}`));
+    bookings.forEach(b=>{
+      const item = document.createElement('div');
+      item.className='p-3 bg-purple-900 bg-opacity-50 rounded-lg border border-purple-700 shadow-inner';
+      const [hour,minute]=safeGet(b,'time','00:00').split(':');
+      const timeString=new Date(0,0,0,hour,minute).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      item.innerHTML=`<div class="flex justify-between items-start"><p class="font-semibold text-white">${safeGet(b,'description')}</p><span class="text-xs font-mono text-secondary-accent bg-purple-800 px-2 py-0.5 rounded-full">${safeGet(b,'date')}</span></div>
+      <p class="text-sm text-purple-300 mt-1">${timeString}</p>`;
+      historyList.appendChild(item);
+    });
+  };
+
+  // --- FIREBASE INITIALIZATION ---
+  const initFirebase = async () => {
+    if(LOCAL_MODE){
+      userId = crypto.randomUUID();
+      document.getElementById('userIdDisplay').textContent='LOCAL_MODE-'+userId.substring(0,8);
+      addNotification("Running in LOCAL MODE: No database connection.",'info');
+      renderContacts([]);
+      return;
+    }
+
+    try {
+      const app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+      auth = getAuth(app);
+      await signInAnonymously(auth);
+      onAuthStateChanged(auth,user=>{
+        if(user){
+          userId = user.uid;
+          document.getElementById('userIdDisplay').textContent = userId;
+          addNotification("Authenticated successfully.",'success');
+          setupContactListener();
+        }
+      });
+    } catch(e){
+      console.error("Firebase Init Error:",e);
+      addNotification("Firebase init failed. Switching to LOCAL MODE.",'error');
+      userId = crypto.randomUUID();
+      document.getElementById('userIdDisplay').textContent='LOCAL_MODE-'+userId.substring(0,8);
+      renderContacts([]);
+    }
+  };
+
+  // --- FIRESTORE LISTENER ---
+  const setupContactListener = () => {
+    if(!db || !userId) return;
+    const contactsRef = collection(db, `users/${userId}/contacts`);
+    onSnapshot(contactsRef, snapshot=>{
+      const contacts=[];
+      snapshot.forEach(doc=>contacts.push({id:doc.id,...doc.data()}));
+      contacts.sort((a,b)=>a.name.localeCompare(b.name));
+      renderContacts(contacts);
+    },error=>{
+      console.error("Error fetching contacts:",error);
+      addNotification("Failed to load contacts.",'error');
+    });
+  };
+
+  // --- FORM HANDLERS ---
+  const handleAddContact = async (e) => {
+    e.preventDefault();
+    const nameInput = document.getElementById('name').value.trim();
+    const emailInput = document.getElementById('email').value.trim();
+    const phoneInput = document.getElementById('phone').value.trim();
+
+    if(!nameInput||!emailInput){
+      addNotification("Name and Email are required.",'error');
+      return;
+    }
+
+    if(LOCAL_MODE){
+      const newContact={id:crypto.randomUUID(), name:nameInput,email:emailInput,phone:phoneInput,bookings:[],createdAt:{toDate:()=>new Date()}};
+      addNotification(`Contact "${nameInput}" added in LOCAL MODE. Reload clears it.`,'info');
+      renderContacts([newContact]);
+      document.getElementById('addContactForm').reset();
+      return;
+    }
+
+    try{
+      const contactsRef = collection(db, `users/${userId}/contacts`);
+      await addDoc(contactsRef,{name:nameInput,email:emailInput,phone:phoneInput,bookings:[],createdAt:serverTimestamp()});
+      addNotification(`Contact "${nameInput}" added successfully.`,'success');
+      document.getElementById('addContactForm').reset();
+    } catch(e){ console.error(e); addNotification("Error saving contact.",'error'); }
+  };
+
+  const handleAddBooking = async (e) => {
+    e.preventDefault();
+    if(!currentContactId){ addNotification("No contact selected.",'error'); return; }
+    const dateInput=document.getElementById('bookingDate').value;
+    const timeInput=document.getElementById('bookingTime').value;
+    const descriptionInput=document.getElementById('bookingDescription').value.trim();
+    const contactName=document.getElementById('detailName').textContent;
+
+    if(!dateInput||!timeInput||!descriptionInput){ addNotification("All fields required.",'error'); return; }
+
+    if(LOCAL_MODE){
+      addNotification(`Booking for "${contactName}" added in LOCAL MODE.`,'info');
+      document.getElementById('addBookingForm').reset();
+      closeModal();
+      return;
+    }
+
+    try{
+      const contactDocRef = doc(db, `users/${userId}/contacts`, currentContactId);
+      await updateDoc(contactDocRef,{ bookings: arrayUnion({date:dateInput,time:timeInput,description:descriptionInput,bookedAt:new Date().toISOString()}) });
+      addNotification(`Booking for "${contactName}" added successfully.`,'success');
+      document.getElementById('addBookingForm').reset();
+      closeModal();
+    } catch(e){ console.error(e); addNotification("Error adding booking.",'error'); }
+  };
+
+  // --- EVENT LISTENERS ---
+  window.onload = ()=>{
+    initFirebase();
+    document.getElementById('addContactForm').addEventListener('submit',handleAddContact);
+    document.getElementById('addBookingForm').addEventListener('submit',handleAddBooking);
+  };
+</script>
+
+
+</body>
+</html>
